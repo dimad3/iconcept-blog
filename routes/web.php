@@ -11,12 +11,23 @@ Route::middleware(['auth'])->group(function () {
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 
-    // Only authorized users can manage their posts
-    Route::resource('posts', PostController::class)->except(['index', 'show']);
+    // Route::resource('posts', PostController::class)->except(['index', 'show']);
     Route::get('my-posts', [PostController::class, 'myPosts'])->name('my_posts');
 
+    Route::get('posts/create', [PostController::class, 'create'])->name('posts.create');
+    Route::post('posts', [PostController::class, 'store'])->name('posts.store');
+
+    // Allow only post authors to edit/delete their posts
+    Route::middleware(['can:manage-post,post'])->group(function () {
+        Route::get('posts/{post}/edit', [PostController::class, 'edit'])->name('posts.edit');
+        Route::put('posts/{post}', [PostController::class, 'update'])->name('posts.update');
+        Route::delete('posts/{post}', [PostController::class, 'destroy'])->name('posts.destroy');
+    });
+
     // Comments (only logged-in users can create/delete)
-    Route::resource('comments', CommentController::class)->only(['store', 'destroy']);
+    // Route::resource('comments', CommentController::class)->only(['store', 'destroy'])->middleware(['can:manage-comment,comment']);
+    Route::post('comments', [CommentController::class, 'store'])->name('comments.store');
+    Route::delete('comments/{comment}', [CommentController::class, 'destroy'])->name('comments.destroy')->middleware(['can:manage-comment,comment']);
 });
 
 // include the authentication routes defined in auth.php

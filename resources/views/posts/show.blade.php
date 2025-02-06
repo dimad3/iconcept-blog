@@ -60,13 +60,13 @@
                         class="text-sm text-gray-600">({{ $comment->created_at->diffForHumans() }})</span></p>
                 <p class="text-gray-700 mt-2">{{ $comment->content }}</p>
 
-                @if (auth()->check() && auth()->id() == $comment->user_id)
+                @can('manage-comment', $comment)
                     <form action="{{ route('comments.destroy', $comment) }}" method="POST" class="inline">
                         @csrf @method('DELETE')
                         <button type="submit" class="text-red-500 text-sm"
                             onclick="return confirm('Delete this comment?')">Delete comment</button>
                     </form>
-                @endif
+                @endcan
             </div>
 
         @empty
