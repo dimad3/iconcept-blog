@@ -20,18 +20,24 @@ return new class extends Migration
         Schema::create('posts', function (Blueprint $table) {
             $table->id();
             $table->string('title');
-            $table->mediumText('body');
+            $table->string('body', 2000);
             $table->text('content');
-            $table->foreignId('category_id')->constrained()->onDelete('cascade');
             $table->foreignId('user_id')->constrained()->onDelete('cascade');
             $table->timestamps();
         });
 
         Schema::create('comments', function (Blueprint $table) {
             $table->id();
-            $table->text('content');
+            $table->string('content', 500);
             $table->foreignId('post_id')->constrained()->onDelete('cascade');
             $table->foreignId('user_id')->constrained()->onDelete('cascade');
+            $table->timestamps();
+        });
+
+        Schema::create('category_post', function (Blueprint $table) {
+            $table->id();
+            $table->foreignId('post_id')->constrained()->onDelete('cascade');
+            $table->foreignId('category_id')->constrained()->onDelete('cascade');
             $table->timestamps();
         });
     }
@@ -41,6 +47,7 @@ return new class extends Migration
      */
     public function down(): void
     {
+        Schema::dropIfExists('category_post');
         Schema::dropIfExists('comments');
         Schema::dropIfExists('posts');
         Schema::dropIfExists('categories');

@@ -21,16 +21,16 @@
     </div>
 
     <div>
-        <label for="category_id" class="block text-gray-700">Category</label>
-        <select id="category_id" name="category_id" class="w-full border rounded p-2" required>
-            <option value=""></option>
+        <label for="category_id" class="block text-gray-700">Categories</label>
+        <select id="category_id" name="category_ids[]" multiple class="w-full border rounded p-2" required>
             @foreach ($categories as $category)
                 <option value="{{ $category->id }}"
-                    {{ old('category_id', $post->category_id) == $category->id ? 'selected' : '' }}>
+                    {{ in_array($category->id, old('category_ids', $post->categories->pluck('id')->toArray())) ? 'selected' : '' }}>
                     {{ $category->name }}
                 </option>
             @endforeach
         </select>
+        <p class="text-sm text-gray-500">Hold down Ctrl (Windows) or Command (Mac) to select multiple categories.</p>
     </div>
 
     <button type="submit" class="bg-blue-500 px-4 py-2 text-white rounded">

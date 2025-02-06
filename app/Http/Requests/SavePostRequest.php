@@ -23,9 +23,10 @@ class SavePostRequest extends FormRequest
     {
         return [
             'title' => 'required|string|max:255',
-            'body' => 'required|string',
+            'body' => 'required|string|max:2000',
             'content' => 'required|string',
-            'category_id' => 'required|exists:categories,id',
+            'category_ids' => 'required|array|min:1',
+            'category_ids.*' => 'exists:categories,id',
         ];
     }
 }

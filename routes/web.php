@@ -1,17 +1,9 @@
 <?php
 
-use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\CommentController;
 use App\Http\Controllers\PostController;
 use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
-
-// Public routes
-Route::get('/', function () {
-    return view('welcome');
-})->name('home');
-Route::get('posts', [PostController::class, 'index'])->name('posts.index');
-Route::get('posts/{post}', [PostController::class, 'show'])->name('posts.show');
 
 // Protect routes with middleware
 Route::middleware(['auth'])->group(function () {
@@ -29,3 +21,13 @@ Route::middleware(['auth'])->group(function () {
 
 // include the authentication routes defined in auth.php
 require __DIR__ . '/auth.php';
+
+// Public routes
+Route::get('/', function () {
+    return view('welcome');
+})->name('home');
+
+Route::get('posts', [PostController::class, 'index'])->name('posts.index');
+Route::get('posts/{post}', [PostController::class, 'show'])->name('posts.show');
+
+Route::get('categories/{category}/posts', [PostController::class, 'categoryPosts'])->name('categories.posts.index');

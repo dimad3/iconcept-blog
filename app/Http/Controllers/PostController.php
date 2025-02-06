@@ -13,18 +13,23 @@ class PostController extends Controller
      */
     public function index()
     {
-        $posts = Post::with('category', 'user')->latest()->paginate(10);
-        return view('posts.index', compact('posts'));
+        ($posts = Post::with('categories', 'user')->latest()->paginate(10));
+        $heading = 'All Posts';
+        return view('posts.index', compact('posts', 'heading'));
     }
 
-    /**
-     * Display a listing of the resource.
-     */
     public function myPosts()
     {
-        $user = auth()->user();
-        $posts = Post::forUser($user)->with('category', 'user')->latest()->paginate(10);
-        return view('posts.index', compact('posts'));
+        $posts = Post::forUser(auth()->user())->with('categories', 'user')->latest()->paginate(10);
+        $heading = 'My Posts';
+        return view('posts.index', compact('posts', 'heading'));
+    }
+
+    public function categoryPosts(Category $category)
+    {
+        $posts = $category->posts()->with('categories', 'user')->latest()->paginate(10);
+        $heading = "Posts in {$category->name}";
+        return view('posts.index', compact('posts', 'heading'));
     }
 
     /**
@@ -41,13 +46,10 @@ class PostController extends Controller
      */
     public function store(SavePostRequest $request)
     {
-        Post::create([
-            'title' => $request->title,
-            'body' => $request->body,
-            'content' => $request->content,
-            'category_id' => $request->category_id,
-            'user_id' => auth()->id(),
-        ]);
+        $post = auth()->user()->posts()->create($request->only(['title', 'body', 'content']));
+
+        // Attach selected categories
+        $post->categories()->attach($request->category_ids);
 
         return redirect()->route('posts.index')->with('success', 'Post created successfully.');
     }
@@ -75,12 +77,10 @@ class PostController extends Controller
      */
     public function update(SavePostRequest $request, Post $post)
     {
-        $post->update([
-            'title' => $request->title,
-            'body' => $request->body,
-            'content' => $request->content,
-            'category_id' => $request->category_id,
-        ]);
+        $post->update($request->only(['title', 'body', 'content']));
+
+        // Sync categories
+        $post->categories()->sync($request->category_ids);
 
         return redirect()->route('posts.index')->with('success', 'Post updated successfully.');
     }

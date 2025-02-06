@@ -3,6 +3,7 @@
 namespace Database\Factories;
 
 use App\Models\Category;
+use App\Models\Post;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
@@ -22,8 +23,16 @@ class PostFactory extends Factory
             'title' => fake()->sentence(),
             'body' => fake()->paragraph(),
             'content' => fake()->text(1000),
-            'category_id' => Category::inRandomOrder()->first()->id ?? Category::factory(),
             'user_id' => User::inRandomOrder()->first()->id ?? User::factory(),
         ];
+    }
+
+    public function configure()
+    {
+        return $this->afterCreating(function (Post $post) {
+            // Attach multiple random categories to the post
+            $categories = \App\Models\Category::inRandomOrder()->limit(rand(1, 5))->pluck('id');
+            $post->categories()->attach($categories);
+        });
     }
 }
