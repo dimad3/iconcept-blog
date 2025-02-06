@@ -2,6 +2,9 @@
 
 namespace Database\Seeders;
 
+use App\Models\Category;
+use App\Models\Comment;
+use App\Models\Post;
 use App\Models\User;
 // use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
@@ -13,11 +16,37 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
-        // User::factory(10)->create();
+        // Insert static categories
+        $categories = [
+            'PHP',
+            'Laravel',
+            'MySQL',
+            'PostgreSQL',
+            'MongoDB',
+            'Node.js',
+            'JS',
+            'jQuery',
+            'Vue',
+            'React',
+            'Angular',
+            'Bootstrap',
+            'Tailwind',
+            'Sass',
+            'CSS',
+            'HTML'
+        ];
 
-        User::factory()->create([
-            'name' => 'Test User',
-            'email' => 'test@example.com',
-        ]);
+        foreach ($categories as $category) {
+            Category::firstOrCreate(['name' => $category]);
+        }
+
+        // Create users
+        User::factory(10)->create();
+
+        // Create posts
+        Post::factory(100)->create();
+
+        // Create comments
+        Comment::factory(300)->create();
     }
 }
