@@ -53,7 +53,7 @@
                     <form action="{{ route('comments.destroy', $comment) }}" method="POST" class="inline">
                         @csrf @method('DELETE')
                         <button type="submit" class="text-red-500 text-sm"
-                            onclick="return confirm('Delete this comment?')">Delete</button>
+                            onclick="return confirm('Delete this comment?')">Delete comment</button>
                     </form>
                 @endif
             </div>
