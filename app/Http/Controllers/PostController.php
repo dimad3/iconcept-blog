@@ -13,22 +13,57 @@ class PostController extends Controller
      */
     public function index()
     {
-        ($posts = Post::with('categories', 'user')->latest()->paginate(10));
-        $heading = 'All Posts';
+        $query = Post::with('categories', 'user');
+
+        // Check if search query exists
+        if (request('search')) {
+            $query->where(function ($q) {
+                $q->where('title', 'like', '%' . request('search') . '%')
+                    ->orWhere('body', 'like', '%' . request('search') . '%');
+            });
+        }
+
+        $posts = $query->latest()->paginate(10)->withQueryString();
+        $heading = request('search') ? "Search results for: " . request('search') : "All Posts";
+
         return view('posts.index', compact('posts', 'heading'));
     }
 
     public function myPosts()
     {
-        $posts = Post::forUser(auth()->user())->with('categories', 'user')->latest()->paginate(10);
-        $heading = 'My Posts';
+        $query = Post::forUser(auth()->user())->with('categories', 'user');
+
+        if (request('search')) {
+            $query->where(function ($q) {
+                $q->where('title', 'like', '%' . request('search') . '%')
+                    ->orWhere('body', 'like', '%' . request('search') . '%');
+            });
+        }
+
+        $posts = $query->latest()->paginate(10)->withQueryString();
+        $heading = request('search')
+            ? "Search results for \"" . request('search') . "\" in My Posts"
+            : "My Posts";
+
         return view('posts.index', compact('posts', 'heading'));
     }
 
     public function categoryPosts(Category $category)
     {
-        $posts = $category->posts()->with('categories', 'user')->latest()->paginate(10);
-        $heading = "Posts in {$category->name}";
+        $query = $category->posts()->with('categories', 'user');
+
+        if (request('search')) {
+            $query->where(function ($q) {
+                $q->where('title', 'like', '%' . request('search') . '%')
+                    ->orWhere('body', 'like', '%' . request('search') . '%');
+            });
+        }
+
+        $posts = $query->latest()->paginate(10)->withQueryString();
+        $heading = request('search')
+            ? "Search results for \"" . request('search') . "\" in {$category->name}"
+            : "Posts in {$category->name}";
+
         return view('posts.index', compact('posts', 'heading'));
     }
 
